@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html b:version='2' class='v2' expr:dir='data:blog.languageDirection' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gdata' xmlns:data='http://www.google.com/2005/gdata' xmlns:expr='http://www.google.com/2005/gdata'>
+<head>
+    <meta charset='UTF-8'/>
+    <meta content='width=device-width, initial-scale=1.0' name='viewport'/>
+    <title><data:blog.pageTitle/> - Universal Eye</title>
+    <b:include data='blog' name='all-head-content'/>
+    
+    <b:skin><![CDATA[
+        :root {
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --text-color: #1d1d1f;
+            --subtext-color: #6e6e73;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --shadow: rgba(0, 0, 0, 0.05);
+            --border: rgba(0, 0, 0, 0.1);
+            --accent-color: #007aff;
+            --button-hover: #0062cc;
+            --error-color: #ff3b30;
+            --chat-bg: #e5e5ea;
+            --user-bg: #007aff;
+            --ai-bg: #f5f5f5;
+            --file-bg: #f0f0f0;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1c1c1e;
+            --card-bg: #2c2c2e;
+            --text-color: #f5f5f7;
+            --subtext-color: #a1a1a6;
+            --nav-bg: rgba(28, 28, 30, 0.95);
+            --shadow: rgba(0, 0, 0, 0.2);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent-color: #0a84ff;
+            --button-hover: #40c4ff;
+            --error-color: #ff6b6b;
+            --chat-bg: #2c2c2e;
+            --user-bg: #0a84ff;
+            --ai-bg: #3a3a3c;
+            --file-bg: #4a4a4c;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            overflow: hidden;
+        }
+
+        .navbar {
+            background-color: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 16px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        #theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+            margin-top: 60px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .chat-history {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-session {
+            padding: 10px;
+            background: var(--chat-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-color);
+            transition: background-color 0.3s;
+            word-break: break-word;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-session:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .chat-session.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .chat-session .delete-session-btn {
+            background: none;
+            border: none;
+            color: var(--error-color);
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .chat-session:hover .delete-session-btn {
+            opacity: 1;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg);
+            transition: background-color 0.3s;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .chat-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .chat-header button {
+            background: none;
+            border: none;
+            color: var(--error-color);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--chat-bg);
+            transition: background-color 0.3s;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+            gap: 10px;
+            position: relative;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.ai {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            position: relative;
+            word-break: break-word;
+        }
+
+        .message.user .message-content {
+            background: var(--user-bg);
+            color: white;
+        }
+
+        .message.ai .message-content {
+            background: var(--ai-bg);
+            color: var(--text-color);
+        }
+
+        .message.file .message-content {
+            background: var(--file-bg);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .message.file img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+        }
+
+        .message.file a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .message-timestamp {
+            font-size: 10px;
+            color: var(--subtext-color);
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message.ai .message-timestamp {
+            text-align: left;
+        }
+
+        .message .delete-message-btn {
+            position: absolute;
+            top: 5px;
+            background: none;
+            border: none;
+            color: var(--error-color);
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .message.user .delete-message-btn {
+            right: 5px;
+        }
+
+        .message.ai .delete-message-btn {
+            left: 5px;
+        }
+
+        .message:hover .delete-message-btn {
+            opacity: 1;
+        }
+
+        .typing-indicator {
+            display: none;
+            font-size: 12px;
+            color: var(--subtext-color);
+            margin-bottom: 20px;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-indicator span {
+            animation: blink 1s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            background: var(--card-bg);
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+            align-items: center;
+        }
+
+        .chat-input .input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-input textarea {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+            background: var(--card-bg);
+            color: var(--text-color);
+            min-height: 40px;
+            max-height: 120px;
+        }
+
+        .chat-input textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .chat-input .file-upload {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .chat-input .file-upload input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .chat-input .file-upload-label {
+            font-size: 20px;
+            color: var(--subtext-color);
+            cursor: pointer;
+        }
+
+        .chat-input button {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .chat-input button:hover {
+            background: var(--button-hover);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 150px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .chat-area {
+                height: calc(100vh - 210px);
+            }
+
+            .chat-messages {
+                padding: 15px;
+            }
+
+            .chat-input {
+                padding: 15px;
+                flex-wrap: wrap;
+            }
+
+            .chat-input .input-wrapper {
+                width: 100%;
+            }
+
+            .chat-input textarea {
+                font-size: 12px;
+                min-height: 36px;
+            }
+
+            .chat-input button {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .message-content {
+                max-width: 80%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .nav-links {
+                margin-top: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-links a {
+                font-size: 14px;
+            }
+
+            .chat-header h2 {
+                font-size: 16px;
+            }
+
+            .chat-header button {
+                font-size: 12px;
+            }
+
+            .message-content {
+                font-size: 12px;
+                max-width: 85%;
+            }
+
+            .message.file img {
+                max-width: 80px;
+                max-height: 80px;
+            }
+
+            .chat-input textarea {
+                font-size: 12px;
+            }
+
+            .chat-input .file-upload-label {
+                font-size: 18px;
+            }
+
+            .chat-session .delete-session-btn {
+                opacity: 1;
+            }
+
+            .message .delete-message-btn {
+                opacity: 1;
+            }
+        }
+    ]]></b:skin>
+</head>
+<body>
+    <b:section class='navbar' id='navbar' maxwidgets='1' showaddelement='no'>
+        <b:widget id='Header1' type='Header' locked='true'>
+            <b:includable id='main'>
+                <nav class='navbar'>
+                    <a class='logo' expr:href='data:blog.homepageUrl'>Universal Eye</a>
+                    <div class='nav-links'>
+                        <a href='#'>Dashboard</a>
+                        <a href='#'>Tools</a>
+                        <a href='#'>AI Chat</a>
+                        <a href='#'>Support</a>
+                        <button id='theme-toggle'>☀️</button>
+                    </div>
+                </nav>
+            </b:includable>
+        </b:widget>
+    </b:section>
+
+    <div class='container'>
+        <b:section class='sidebar' id='sidebar' maxwidgets='1' showaddelement='no'>
+            <b:widget id='HTML1' type='HTML' title='Chat History'>
+                <b:includable id='main'>
+                    <div class='sidebar'>
+                        <h2>Chat History</h2>
+                        <div class='chat-history' id='chat-history'>
+                            <!-- Chat sessions will be added here -->
+                        </div>
+                    </div>
+                </b:includable>
+            </b:widget>
+        </b:section>
+
+        <b:section class='chat-area' id='main' preferred='yes'>
+            <b:widget id='HTML2' type='HTML' title='AI Chat'>
+                <b:includable id='main'>
+                    <div class='chat-area'>
+                        <div class='chat-header'>
+                            <h2>AI Chat</h2>
+                            <button onclick='startNewChat()'>New Chat</button>
+                        </div>
+                        <div class='chat-messages' id='chat-messages'>
+                            <!-- Messages will be added here -->
+                        </div>
+                        <div class='typing-indicator' id='typing-indicator'>
+                            AI is typing<span>.</span><span>.</span><span>.</span>
+                        </div>
+                        <div class='chat-input'>
+                            <div class='input-wrapper'>
+                                <div class='file-upload'>
+                                    <input id='file-upload' onchange='handleFileUpload(this.files)' type='file' accept='image/*,application/pdf'/>
+                                    <label class='file-upload-label' for='file-upload'>📎</label>
+                                </div>
+                                <textarea id='chat-input' placeholder='Type your message...' rows='1' oninput='autoResize(this)' onkeypress='if(event && event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendMessage(); }'></textarea>
+                            </div>
+                            <button onclick='sendMessage()'>Send</button>
+                        </div>
+                    </div>
+                </b:includable>
+            </b:widget>
+        </b:section>
+    </div>
+
+    <script src='https://raw.githubusercontent.com/Idura1/chat-script/f6632901225006f4294815143583cec3ffedec31/chat-script.js' type='text/javascript'></script>
+</body>
+</html>
