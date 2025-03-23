@@ -49,6 +49,10 @@
             overflow: hidden;
             height: 100vh;
             transition: all 0.3s ease;
+            -webkit-user-select: none; /* Disable text selection */
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .navbar {
@@ -396,6 +400,10 @@
             max-height: 150px;
             font-size: 0.95rem;
             transition: border 0.3s ease;
+            -webkit-user-select: text; /* Allow text selection only in input */
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         #chat-input:focus {
@@ -452,7 +460,7 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;"> <!-- Disable right-click -->
     <!-- Navigation Bar -->
     <nav class="navbar">
         <a href="#" class="logo"><i class="fas fa-eye"></i> Universal Eye</a>
@@ -530,6 +538,35 @@
         let chatSessions = [];
         let currentSessionId = null;
 
+        // Security: Disable keyboard shortcuts
+        document.onkeydown = function (e) {
+            if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'i' || e.key === 'j')) {
+                e.preventDefault();
+                alert("Access to developer tools and source code is restricted.");
+                return false;
+            }
+            if (e.key === 'F12') {
+                e.preventDefault();
+                alert("Access to developer tools is restricted.");
+                return false;
+            }
+        };
+
+        // Security: Warn on developer tools opening
+        (function() {
+            let devtoolsOpen = false;
+            setInterval(() => {
+                if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+                    if (!devtoolsOpen) {
+                        alert("Developer tools detected! Access is restricted.");
+                        devtoolsOpen = true;
+                    }
+                } else {
+                    devtoolsOpen = false;
+                }
+            }, 1000);
+        })();
+
         // Theme Toggle
         const themeToggle = document.getElementById('theme-toggle');
         themeToggle.addEventListener('click', () => {
@@ -599,8 +636,11 @@
 
         async function sendMessage() {
             const input = document.getElementById('chat-input');
-            const text = input.value.trim();
+            let text = input.value.trim();
             if (!text) return;
+
+            // Security: Basic input sanitization to prevent XSS
+            text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
             const session = chatSessions.find(s => s.id === currentSessionId);
             session.messages.push({ role: 'user', text });
@@ -639,7 +679,7 @@
         }
 
         function deleteSession(id, event) {
-            event.stopPropagation(); // Prevent session loading on delete click
+            event.stopPropagation();
             chatSessions = chatSessions.filter(s => s.id !== id);
             if (chatSessions.length === 0) {
                 startNewChat();
@@ -677,7 +717,6 @@
             session.messages.push({ role: 'user', text: `Uploaded file: ${file.name}` });
             updateChatMessages();
             saveChatSessions();
-            // Add file processing logic if needed
         }
 
         loadChatSessions();
